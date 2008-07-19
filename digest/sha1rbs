@@ -1,0 +1,32 @@
+#!/usr/bin/ruby
+# tar c /nexus/stash/ | sha1rbs | nc targetbox -p 3003
+# nc -p 3003 | sha1rbs | tar x /nexus/horde/stash
+# 1G : 13838132923832
+# 2G : 18382832828238
+require 'digest/sha1'
+KILO = 1024
+MEGS = 1024 * 1024
+GIGS = 1024 * 1024 * 1024
+BORED = 60
+start = Time.now
+awhileago = start
+digest = Digest::SHA1.new
+size = 0
+count = 0
+STDERR.puts "starting... "
+
+while( r = STDIN.read(KILO) ) do
+  digest << r
+  size += 1024
+  if (size / GIGS) != count
+    STDERR.puts "#{count}G: #{digest.hexdigest} - #{Time.now - start}"
+    STDERR.flush
+    count = size / 1073741824
+  end
+  if ( Time.now - awhileago ) > BORED
+    STDERR.printf("%.2fM : #{digest.hexdigest} - #{(Time.now - start).to_i}", (size / MEGS.to_f) )
+    awhileago = Time.now
+  end
+  STDOUT << r
+end
+STDERR.puts "done... #{count} : #{digest.hexdigest} "
