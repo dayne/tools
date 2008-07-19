@@ -7,7 +7,7 @@ require 'digest/sha1'
 KILO = 1024
 MEGS = 1024 * 1024
 GIGS = 1024 * 1024 * 1024
-BORED = 60
+BORED = 120
 start = Time.now
 awhileago = start
 digest = Digest::SHA1.new
