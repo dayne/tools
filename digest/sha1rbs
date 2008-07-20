@@ -20,11 +20,11 @@ while( r = STDIN.read(KILO) ) do
   size += 1024
   if (size / GIGS) != count
     count = size / 1073741824
-    STDERR.puts "#{count}G: #{digest.hexdigest} - #{Time.now - start}"
+    STDERR.puts "#{count}G: #{digest.hexdigest} - #{(Time.now-start).to_i}"
     STDERR.flush
   end
   if ( Time.now - awhileago ) > BORED
-    STDERR.puts "#{size/MEGS.to_i} : #{digest.hexdigest} - #{(Time.now - start).to_i}\n" 
+    STDERR.puts "#{(size/MEGS).to_i}M: #{digest.hexdigest} - #{(Time.now-start).to_i}" 
     awhileago = Time.now
   end
   STDOUT << r
