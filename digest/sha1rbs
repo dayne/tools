@@ -7,7 +7,7 @@ require 'digest/sha1'
 KILO = 1024
 MEGS = 1024 * 1024
 GIGS = 1024 * 1024 * 1024
-BORED = 120
+BORED = 180
 start = Time.now
 awhileago = start
 digest = Digest::SHA1.new
@@ -24,7 +24,7 @@ while( r = STDIN.read(KILO) ) do
     STDERR.flush
   end
   if ( Time.now - awhileago ) > BORED
-    STDERR.printf("%.2fM : #{digest.hexdigest} - #{(Time.now - start).to_i}\n", (size / MEGS.to_f) )
+    STDERR.puts "#{size/MEGS.to_i} : #{digest.hexdigest} - #{(Time.now - start).to_i}\n" 
     awhileago = Time.now
   end
   STDOUT << r
