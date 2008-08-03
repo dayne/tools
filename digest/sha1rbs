@@ -14,17 +14,22 @@ digest = Digest::SHA1.new
 size = 0
 count = 0
 STDERR.puts "starting... "
-
+began = false
 while( r = STDIN.read(KILO) ) do
   digest << r
+  unless began
+    start = awhileago = Time.now
+    STDERR.puts "data send began"
+    began = true
+  end
   size += 1024
   if (size / GIGS) != count
     count = size / 1073741824
-    STDERR.puts "#{count}G: #{digest.hexdigest} - #{(Time.now-start).to_i}"
+    STDERR.puts "#{count}G: #{digest.hexdigest} - #{Time.now - start}"
     STDERR.flush
   end
   if ( Time.now - awhileago ) > BORED
-    STDERR.puts "#{(size/MEGS).to_i}M: #{digest.hexdigest} - #{(Time.now-start).to_i}" 
+    STDERR.puts "#{size/MEGS.to_i} : #{digest.hexdigest} - #{(Time.now - start).to_i}\n" 
     awhileago = Time.now
   end
   STDOUT << r
