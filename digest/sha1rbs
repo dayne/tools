@@ -1,8 +1,6 @@
-#!/usr/bin/ruby
-# tar c /nexus/stash/ | sha1rbs | nc targetbox -p 3003
-# nc -p 3003 | sha1rbs | tar x /nexus/horde/stash
-# 1G : 13838132923832
-# 2G : 18382832828238
+#!/usr/bin/env ruby
+# tar cf - /nexus/stash/ | sha1rbs | nc targetbox 3003
+# nc -l -p 3003 | sha1rbs | tar xf - 
 require 'digest/sha1'
 KILO = 1024
 MEGS = 1024 * 1024
@@ -29,9 +27,12 @@ while( r = STDIN.read(KILO) ) do
     STDERR.flush
   end
   if ( Time.now - awhileago ) > BORED
-    STDERR.puts "#{size/MEGS.to_i} : #{digest.hexdigest} - #{(Time.now - start).to_i}\n" 
+    STDERR.puts "#{size/MEGS.to_i}M : #{digest.hexdigest} - #{(Time.now - start).to_i}\n" 
     awhileago = Time.now
   end
   STDOUT << r
 end
 STDERR.puts "done... #{count} : #{digest.hexdigest} "
+STDOUT.close
+STDIN.close
+exit
