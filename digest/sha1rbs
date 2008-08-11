@@ -22,7 +22,7 @@ while( r = STDIN.read(KILO) ) do
   end
   size += 1024
   if (size / GIGS) != count
-    count = size / 1073741824
+    count = size / GIGS
     STDERR.puts "#{count}G: #{digest.hexdigest} - #{Time.now - start}"
     STDERR.flush
   end
