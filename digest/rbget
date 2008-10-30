@@ -13,8 +13,8 @@ require 'optparse'
 def usage(msg=nil)
   $stderr.puts(msg) if msg
   program_name = File.basename($0)
-  $stderr.puts "Incorrect usage of #{program_name}."
-  $stderr.puts "Check out --help for options"
+  $stderr.puts "Incorrect usage of #{program_name}." unless msg
+  $stderr.puts "Check out --help for options" unless msg
   exit 1
 end
 
@@ -27,7 +27,9 @@ ARGV.options do |opt|
 
   opt.on("Options")
   opt.on("-f", "--force", "force removal of an existing target file") { force = true }
-  opt.on("-m", "--md5sum <md5sum>", String, "expected md5sum of the file") { |md5sum|  }
+  opt.on("-m", "--md5sum <md5sum>", String, "expected md5sum of the file") { |md5sum|  
+    usage('invalid md5sum') if md5sum.size != 32
+  }
   opt.on("-t", "--target <dir>", String, "target directory to download to") { |target_dir| }
   opt.on("-h", "--help", "This help.. right here.. now") {puts opt; exit 0}
   opt.on("-v", "--verbose", "Jibber Jabber More") { $verbose = true }
@@ -82,9 +84,11 @@ end
 
 md5 = digest.hexdigest
 
+File.open( "#{filename}.md5", "w" ) { |f| f << md5 + "  " + filename + "\n" }
+
 if md5sum
   if md5sum  == md5
-    puts "md5sum matchs: #{md5}" if $verbose
+    puts "download succeeded - md5sum matchs: #{md5}" 
   else
     puts "mismatching md5sum:
     expecting: #{md5sum}
@@ -97,5 +101,3 @@ unless force
   puts "moving #{tf.path} to #{filename}" if $verbose
   FileUtils::mv tf.path, filename
 end
-
-File.open( "#{filename}.md5", "w" ) { |f| f << md5 + "  " + filename + "\n" }
