@@ -1,4 +1,9 @@
 #!/usr/bin/env ruby
+# download a file from a URL and save it along with it's md5sum
+# rbget <url>    # saves to current directory
+# rbget <url> -m <expected md5sum>
+# rbget <url> -f # force the overwriting of an existing file
+# rbget <url> -t <target dir for download>
 require 'open-uri'
 require 'tempfile'
 require 'digest/md5'
