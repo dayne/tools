@@ -30,6 +30,7 @@ ARGV.options do |opt|
   opt.on("-m", "--md5sum <md5sum>", String, "expected md5sum of the file") { |md5sum|  }
   opt.on("-t", "--target <dir>", String, "target directory to download to") { |target_dir| }
   opt.on("-h", "--help", "This help.. right here.. now") {puts opt; exit 0}
+  opt.on("-v", "--verbose", "Jibber Jabber More") { $verbose = true }
   opt.parse!
 end
 
@@ -44,11 +45,13 @@ end
  
 filename = File.basename source
 
-puts "source: #{source}"
-puts "target_dir: #{target_dir}"
-puts "md5sum: #{md5sum}"
-puts "force: #{force}"
-puts "filename: #{filename}"
+if $verbose
+  puts "source: #{source}"
+  puts "target_dir: #{target_dir}"
+  puts "md5sum: #{md5sum}"
+  puts "force: #{force}"
+  puts "filename: #{filename}"
+end
 
 Dir.chdir target_dir
 
@@ -66,7 +69,7 @@ last = Time.now
 digest = Digest::MD5.new
 ticker = 0
 
-print "starting: "
+print "starting: " if $verbose
 open( source ) do |remote|
   while not remote.eof?
     r = remote.read(18192)
@@ -74,14 +77,14 @@ open( source ) do |remote|
     tf << r
   end
   tf.close
-  puts " done"
+  puts " done" if $verbose
 end
 
 md5 = digest.hexdigest
 
 if md5sum
   if md5sum  == md5
-    puts "md5sum matchs: #{md5}"
+    puts "md5sum matchs: #{md5}" if $verbose
   else
     puts "mismatching md5sum:
     expecting: #{md5sum}
@@ -91,7 +94,7 @@ if md5sum
 end
 
 unless force
-  puts "moving #{tf.path} to #{filename}"
+  puts "moving #{tf.path} to #{filename}" if $verbose
   FileUtils::mv tf.path, filename
 end
 
