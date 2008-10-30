@@ -1,0 +1,93 @@
+#!/usr/bin/env ruby
+require 'open-uri'
+require 'tempfile'
+require 'digest/md5'
+require 'fileutils'
+require 'optparse'
+
+def usage(msg=nil)
+  $stderr.puts(msg) if msg
+  program_name = File.basename($0)
+  $stderr.puts "Incorrect usage of #{program_name}."
+  $stderr.puts "Check out --help for options"
+  exit 1
+end
+
+url_regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
+
+force = filename = target_dir = md5sum = source = nil
+
+ARGV.options do |opt|
+  opt.banner = "Usage: ruby #{File.basename($0)} [options] <file url>"
+
+  opt.on("Options")
+  opt.on("-f", "--force", "force removal of an existing target file") { force = true }
+  opt.on("-m", "--md5sum <md5sum>", String, "expected md5sum of the file") { |md5sum|  }
+  opt.on("-t", "--target <dir>", String, "target directory to download to") { |target_dir| }
+  opt.on("-h", "--help", "This help.. right here.. now") {puts opt; exit 0}
+  opt.parse!
+end
+
+usage if ARGV.length == 0 
+
+source = ARGV.shift
+target_dir = Dir.pwd unless target_dir
+
+if (!source) or (source.size < 12) or (!url_regexp.match(source))
+  usage "source url is invalid or too short : #{source}"
+end
+ 
+filename = File.basename source
+
+puts "source: #{source}"
+puts "target_dir: #{target_dir}"
+puts "md5sum: #{md5sum}"
+puts "force: #{force}"
+puts "filename: #{filename}"
+
+Dir.chdir target_dir
+
+if force
+  tf = File.new(filename,'w')
+else
+  if File.exists?(filename)
+    puts "#{filename} exists already - exiting out"
+    exit 1
+  end
+  tf = File.new("#{filename}.part",'w')
+end
+total = nil
+last = Time.now
+digest = Digest::MD5.new
+ticker = 0
+
+print "starting: "
+open( source ) do |remote|
+  while not remote.eof?
+    r = remote.read(18192)
+    digest << r
+    tf << r
+  end
+  tf.close
+  puts " done"
+end
+
+md5 = digest.hexdigest
+
+if md5sum
+  if md5sum  == md5
+    puts "md5sum matchs: #{md5}"
+  else
+    puts "mismatching md5sum:
+    expecting: #{md5sum}
+    got:       #{md5}"
+    exit 1
+  end
+end
+
+unless force
+  puts "moving #{tf.path} to #{filename}"
+  FileUtils::mv tf.path, filename
+end
+
+File.open( "#{filename}.md5", "w" ) { |f| f << md5 + "  " + filename + "\n" }
