@@ -41,8 +41,10 @@ ARGV.options do |opt|
       tf << f.read
     }
     FileUtils::mv $0, "#{$0}.old"
-    FileUtils::mv tf.path, $0
     puts "old version stored as #{$0}.old"
+    FileUtils::mv tf.path, $0
+    FileUtils::chmod 0755, $0
+    exit 1
   end
   opt.parse!
 end
