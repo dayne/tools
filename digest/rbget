@@ -49,7 +49,7 @@ ARGV.options do |opt|
   opt.on("-d", "--dir <dir>", String, "target directory to download to") { |target_dir| }
   opt.on("-h", "--help", "This help.. right here.. now") {puts opt; exit 0}
   opt.on("-v", "--verbose", "Jibber Jabber More") { $verbose = true }
-  opt.on("-t", "--test", "Test it") { test(); exit 1 }
+  opt.on("-t", "--test", "Test it - BEEF w/ La Pavoni") { test(); exit 1 }
   opt.on("-n", "--name <filename>", "What to call the downloaded file" ) { |filename| }
   opt.on("-u", "--update", "Update rbget from latest in github") do 
     puts "updating to latest version of rbget in github"
