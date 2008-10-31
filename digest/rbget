@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# ruby basic get - wget replacement with simple dance magic for a known md5sum
 # download a file from a URL and save it along with it's md5sum
 # rbget <url>    # saves to current directory
 # rbget <url> -m <expected md5sum>
@@ -11,11 +12,13 @@ require 'fileutils'
 require 'optparse'
 require 'tempfile'
 
+begin # BEGIN THE FUN
+
 def usage(msg=nil)
-  $stderr.puts(msg) if msg
+  puts(msg) if msg
   program_name = File.basename($0)
-  $stderr.puts "Incorrect usage of #{program_name}." unless msg
-  $stderr.puts "Check out --help for options" unless msg
+  puts "Incorrect usage of #{program_name}." unless msg
+  puts "Check out --help for options" unless msg
   exit 1
 end
 
@@ -114,3 +117,8 @@ unless force
   puts "moving #{tf.path} to #{filename}" if $verbose
   FileUtils::mv tf.path, filename
 end
+
+rescue Exception => error # NO FUN!
+  puts error
+  exit 1
+end # hope we had fun
