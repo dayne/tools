@@ -5,7 +5,5 @@ a wget alternative that generates a <file>.md5 and can compair against an expect
 == sha1rb
 A tool that gives you a runnign sha1 sum of a IO stream.  Useful for large transfers
 via netcat - allowing  you to verify the stuff that was sent actually arrived intact
-<pre>
   tar cf - /nexus/stash/ | sha1rbs | nc targetbox 3003
   nc -l -p 3003 | sha1rbs | tar xf - 
-</pre>
