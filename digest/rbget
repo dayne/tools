@@ -12,6 +12,7 @@ require 'fileutils'
 require 'optparse'
 require 'tempfile'
 
+
 begin # BEGIN THE FUN
 
 def usage(msg=nil)
@@ -20,6 +21,17 @@ def usage(msg=nil)
   puts "Incorrect usage of #{program_name}." unless msg
   puts "Check out --help for options" unless msg
   exit 1
+end
+
+def test
+  puts 'testing rbget'
+  system($0, "http://beef.gina.alaska.edu/pub/i/pavoni.jpg", "-m","d7e828b46d70506a622805ba7825e4e0","-v")
+  puts "error: missing pavoni.jpg" unless File.exist?('pavoni.jpg')
+  puts "error: missing pavoni.jpg.md5" unless File.exist?('pavoni.jpg.md5')
+  puts "error: md5sum mismatch" unless `md5sum pavoni.jpg`.split[0] == 'd7e828b46d70506a622805ba7825e4e0'
+  FileUtils::rm 'pavoni.jpg' if File.exists? 'pavoni.jpg'
+  FileUtils::rm 'pavoni.jpg.part' if File.exists? 'pavoni.jpg.part'
+  FileUtils::rm 'pavoni.jpg.md5' if File.exists? 'pavoni.jpg.md5'
 end
 
 url_regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
@@ -37,6 +49,7 @@ ARGV.options do |opt|
   opt.on("-t", "--target <dir>", String, "target directory to download to") { |target_dir| }
   opt.on("-h", "--help", "This help.. right here.. now") {puts opt; exit 0}
   opt.on("-v", "--verbose", "Jibber Jabber More") { $verbose = true }
+  opt.on("-t", "--test", "Test it") { test(); exit 1 }
   opt.on("-u", "--update", "Update rbget from latest in github") do 
     puts "updating to latest version of rbget in github"
     tf = Tempfile.new('rbget')
@@ -87,16 +100,32 @@ last = Time.now
 digest = Digest::MD5.new
 ticker = 0
 
-print "starting: " if $verbose
-open( source ) do |remote|
-  while not remote.eof?
-    r = remote.read(18192)
-    digest << r
-    tf << r
+puts "starting " if $verbose
+
+tries = 0
+
+while( tries < 2 )  do 
+  begin
+    open( source ) do |remote|
+      while not remote.eof?
+        r = remote.read(18192)
+        digest << r
+        tf << r
+      end
+    end
+  rescue Exception => error
+    if tries < 2
+      puts "first attempt at open(#{source}) failed - #{error}"
+      puts "trying again"
+      tries += 1
+    else
+      raise "Unable to connect and read from #{source}"
+    end
   end
-  tf.close
-  puts " done" if $verbose
+  tries = 3 # yay finished
 end
+tf.close
+puts "done" if $verbose
 
 md5 = digest.hexdigest
 
@@ -122,3 +151,4 @@ rescue Exception => error # NO FUN!
   puts error
   exit 1
 end # hope we had fun
+
