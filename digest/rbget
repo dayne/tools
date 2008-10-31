@@ -102,9 +102,9 @@ ticker = 0
 
 puts "starting " if $verbose
 
+MAX_ATTEMPTS = 2
 tries = 0
-
-while( tries < 2 )  do 
+while( tries < MAX_ATTEMPTS )  do 
   begin
     open( source ) do |remote|
       while not remote.eof?
@@ -122,7 +122,7 @@ while( tries < 2 )  do
       raise "Unable to connect and read from #{source}"
     end
   end
-  tries = 3 # yay finished
+  tries = MAX_ATTEMPTS # yay finished
 end
 tf.close
 puts "done" if $verbose
