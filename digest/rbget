@@ -50,15 +50,13 @@ ARGV.options do |opt|
   opt.on("-h", "--help", "This help.. right here.. now") {puts opt; exit 0}
   opt.on("-v", "--verbose", "Jibber Jabber More") { $verbose = true }
   opt.on("-t", "--test", "Test it") { test(); exit 1 }
+  opt.on("-n", "--name <filename>", "What to call the downloaded file" ) { |filename| }
   opt.on("-u", "--update", "Update rbget from latest in github") do 
     puts "updating to latest version of rbget in github"
-    tf = Tempfile.new('rbget')
-    open('http://github.com/dayne/tools/tree/master%2Fdigest%2Frbget?raw=true'){ |f|
-      tf << f.read
-    }
+    system($0,'http://github.com/dayne/tools/tree/master%2Fdigest%2Frbget?raw=true',"-n","rbget.new")
     FileUtils::mv $0, "#{$0}.old"
-    puts "old version stored as #{$0}.old"
-    FileUtils::mv tf.path, $0
+    FileUtils::mv 'rbget.new', $0
+    FileUtils::rm 'rbget.new.md5', $0
     FileUtils::chmod 0755, $0
     exit 1
   end
@@ -74,7 +72,7 @@ if (!source) or (source.size < 12) or (!url_regexp.match(source))
   usage "source url is invalid or too short : #{source}"
 end
  
-filename = File.basename source
+filename = File.basename source unless filename
 
 if $verbose
   puts "source: #{source}"
