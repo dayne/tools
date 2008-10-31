@@ -54,10 +54,14 @@ ARGV.options do |opt|
   opt.on("-u", "--update", "Update rbget from latest in github") do 
     puts "updating to latest version of rbget in github"
     system($0,'http://github.com/dayne/tools/tree/master%2Fdigest%2Frbget?raw=true',"-n","rbget.new")
-    FileUtils::mv $0, "#{$0}.old"
-    FileUtils::mv 'rbget.new', $0
-    FileUtils::rm 'rbget.new.md5', $0
-    FileUtils::chmod 0755, $0
+    if File.exists?('rbget.new.md5')
+      FileUtils::rm 'rbget.new.md5' 
+      FileUtils::mv $0, "#{$0}.old"
+      FileUtils::mv 'rbget.new', $0
+      FileUtils::chmod 0755, $0
+    else
+      puts "something blew up trying to update rbget"
+    end
     exit 1
   end
   opt.parse!
