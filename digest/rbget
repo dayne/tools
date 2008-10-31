@@ -151,6 +151,7 @@ end
 
 rescue Exception => error # NO FUN!
   puts error
+  $stderr.puts error.backtrace.join("\n\t")
   exit 1
 end # hope we had fun
 
