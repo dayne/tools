@@ -9,6 +9,7 @@ require 'tempfile'
 require 'digest/md5'
 require 'fileutils'
 require 'optparse'
+require 'tempfile'
 
 def usage(msg=nil)
   $stderr.puts(msg) if msg
@@ -33,6 +34,16 @@ ARGV.options do |opt|
   opt.on("-t", "--target <dir>", String, "target directory to download to") { |target_dir| }
   opt.on("-h", "--help", "This help.. right here.. now") {puts opt; exit 0}
   opt.on("-v", "--verbose", "Jibber Jabber More") { $verbose = true }
+  opt.on("-u", "--update", "Update rbget from latest in github") do 
+    puts "updating to latest version of rbget in github"
+    tf = Tempfile.new('rbget')
+    open('http://github.com/dayne/tools/tree/master%2Fdigest%2Frbget?raw=true'){ |f|
+      tf << f.read
+    }
+    FileUtils::mv $0, "#{$0}.old"
+    FileUtils::mv tf.path, $0
+    puts "old version stored as #{$0}.old"
+  end
   opt.parse!
 end
 
