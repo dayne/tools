@@ -104,7 +104,7 @@ ticker = 0
 
 puts "starting " if $verbose
 
-MAX_ATTEMPTS = 2
+MAX_ATTEMPTS = 3
 tries = 0
 while( tries < MAX_ATTEMPTS )  do 
   begin
@@ -113,10 +113,12 @@ while( tries < MAX_ATTEMPTS )  do
         r = remote.read(18192)
         digest << r
         tf << r
+        tf.fsync
       end
     end
+  	tries = MAX_ATTEMPTS # yay finished
   rescue Exception => error
-    if tries < 2
+    if tries < MAX_ATTEMPTS
       puts "first attempt at open(#{source}) failed - #{error}"
       puts "trying again"
       tries += 1
@@ -124,7 +126,6 @@ while( tries < MAX_ATTEMPTS )  do
       raise "Unable to connect and read from #{source}"
     end
   end
-  tries = MAX_ATTEMPTS # yay finished
 end
 tf.close
 puts "done" if $verbose
