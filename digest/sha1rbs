@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # http://github.com/dayne/tools/raw/master/digest/sha1rbs
 # tar cf - /nexus/stash/ | sha1rbs | nc targetbox 3003
-# nc -l -p 3003 | sha1rbs | tar xf - 
+# nc -l 3003 | sha1rbs | tar xf - 
 require 'digest/sha1'
 KILO = 1024
 MEGS = 1024 * 1024
