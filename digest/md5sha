@@ -1,0 +1,46 @@
+#!/usr/bin/env ruby
+
+#
+# simple md5 and sha1 tool (finds both values at the same time)
+
+require 'digest/sha1'
+require 'digest/md5'
+
+KILO = 1024; MEGS = KILO * 1024; GIGS = MEGS * 1024
+def size(s)
+  s = s
+  return "#{s/GIGS}G" if (s / GIGS) > 1
+  return "#{s/MEGS}M" if (s / MEGS) > 1
+  return "#{s/KILO}K" if (s / KILO) > 1
+  return "#{s}B"
+end
+
+target = ARGV.shift || ''
+
+if File.file?(target)
+  puts "opening #{target}"
+  file = File.open(target)
+else
+  puts "no file specified - reading from STDIN"
+  file = STDIN
+end
+
+start = Time.now
+
+sha1digest = Digest::SHA1.new
+md5digest = Digest::MD5.new
+
+size = 0
+
+while( r = file.read( KILO ) ) do 
+  sha1digest << r  
+  md5digest << r  
+# timing this?
+  size += 1024
+end
+
+file.close
+
+puts "SHA1: #{sha1digest.hexdigest}"
+puts "MD5: #{md5digest.hexdigest}"
+puts "SIZE: #{size(size)}"
