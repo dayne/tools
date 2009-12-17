@@ -1,1 +1,8 @@
 * goodreads script : progress bar/status report 52 books a year goal
+* hog : hunt the disk hog utility 
+  hog                # report of current tracked dirs
+  hog info .         # report of '.' dir
+  hog track .        # start tracking (recursive) the '.' dir
+  hog untrack .      # remove/exclude the '.' dir from tracking
+  hog cron           # cron activities
+  -------------------------------------------------------------
