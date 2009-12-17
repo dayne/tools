@@ -6,6 +6,15 @@
 require 'digest/sha1'
 require 'digest/md5'
 
+begin
+  require 'rubygems'
+  require 'progressbar'
+  p = true
+rescue Exception => boom
+  STDERR.puts "no rubygems or progress bar: gem install progressbar"
+  p = false
+end
+
 KILO = 1024; MEGS = KILO * 1024; GIGS = MEGS * 1024
 def size(s)
   s = s
@@ -20,10 +29,14 @@ target = ARGV.shift || ''
 if File.file?(target)
   puts "opening #{target}"
   file = File.open(target)
+  total = File.size(target)
+  p = ProgressBar.new(File.basename(target), total ) if p
 else
   puts "no file specified - reading from STDIN"
   file = STDIN
+  p = false
 end
+
 
 start = Time.now
 
@@ -36,11 +49,14 @@ while( r = file.read( KILO ) ) do
   sha1digest << r  
   md5digest << r  
 # timing this?
-  size += 1024
+  size += 1024 
+  size = total if total and (total < size)
+  p.set(size) if p
 end
 
 file.close
-
+puts ""
 puts "SHA1: #{sha1digest.hexdigest}"
 puts "MD5: #{md5digest.hexdigest}"
 puts "SIZE: #{size(size)}"
+puts "time to compute: #{Time.now - start} seconds"
