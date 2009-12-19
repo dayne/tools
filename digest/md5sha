@@ -27,12 +27,12 @@ end
 target = ARGV.shift || ''
 
 if File.file?(target)
-  puts "opening #{target}"
+  STDERR.puts "opening #{target}"
   file = File.open(target)
   total = File.size(target)
   p = ProgressBar.new(File.basename(target), total ) if p
 else
-  puts "no file specified - reading from STDIN"
+  STDERR.puts "no file specified - reading from STDIN"
   file = STDIN
   p = false
 end
@@ -55,8 +55,9 @@ while( r = file.read( KILO ) ) do
 end
 
 file.close
-puts ""
+STDERR.puts ""
+puts "NAME: #{File.basename(target)}" if target
 puts "SHA1: #{sha1digest.hexdigest}"
 puts "MD5: #{md5digest.hexdigest}"
 puts "SIZE: #{size(size)}"
-puts "time to compute: #{Time.now - start} seconds"
+STDERR.puts "time to compute: #{Time.now - start} seconds"
