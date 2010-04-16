@@ -1,0 +1,63 @@
+#!/usr/bin/env ruby
+
+require 'date'
+
+class Time
+  def to_datetime
+    # Convert seconds + microseconds into a fractional number of seconds
+    seconds = sec + Rational(usec, 10**6)
+
+    # Convert a UTC offset measured in minutes to one measured in a
+    # fraction of a day.
+    offset = Rational(utc_offset, 60 * 60 * 24)
+    DateTime.new(year, month, day, hour, min, seconds, offset)
+  end
+end
+
+
+class Date
+  def to_gm_time
+    to_time(new_offset, :gm)
+  end
+
+  def to_local_time
+    to_time(new_offset(DateTime.now.offset-offset), :local)
+  end
+
+  private
+  def to_time(dest, method)
+    #Convert a fraction of a day to a number of microseconds
+    usec = (dest.sec_fraction * 60 * 60 * 24 * (10**6)).to_i
+    Time.send(method, dest.year, dest.month, dest.day, dest.hour, dest.min,
+              dest.sec, usec)
+  end
+end
+# The above code snippits are taken from O'Reilly's Ruby Cookbook. 
+# Their code reuse policy permits this.
+# http://oreilly.com/pub/a/oreilly/ask_tim/2001/codepolicy.html
+
+def boom(msg=nil)
+  puts "usage:
+  tdiff FIRST_TIME_STRING SECOND_TIME_STRING"
+  puts msg if msg
+  exit
+end
+
+string_first  = ARGV.shift || boom
+string_second = ARGV.shift || boom('missing second time')
+
+first = DateTime.parse(string_first).to_gm_time
+second = DateTime.parse(string_second).to_gm_time
+
+#puts first
+#puts second
+
+diff = second - first
+minutes = (diff / 60).to_i
+seconds = (diff % 60).to_i
+puts "#{minutes}m #{seconds}s"
+
+=begin
+tiff "Fri Apr 16 19:39:07 UTC 2010" "Fri Apr 16 19:51:12 UTC 2010"
+12m 5s
+=end
