@@ -1,0 +1,11 @@
+lots of fun stuff from Why The Lucky Stiff
+
+try.sh : http://redhanded.hobix.com/inspect/rubylessRuby.html
+       : run it through 'sh' to get interactive ruby from TryRuby.hobix.com
+
+chucky_bacon.rb: http://ruby.cycnus.de/chunky_bacon.rb
+       : http://rubyforge.org/pipermail/poignant-stiffs/2005-August/000202.html
+       : runs on port 0xCB = 203  
+       : http://localhost:203/  
+       : http://localhost:203/200  
+       : http://localhost:203/10000
