@@ -31,14 +31,16 @@ class DgsUser
 end
 
 if __FILE__ == $0
-  u = DgsUser.new('bish0p')
+  username = ARGV.shift || 'bish0p'
+  u = DgsUser.new(username)
   loop do 
     u.check
     u.parse
     new = u.current_games - u.last_games
     if new.size > 0
-      puts "----------------- #{Time.now} ---------------"
-      puts new.inspect 
+      new.each do |g|
+        system('mumbles-send',"#{g[:id]}","#{g[:opponent]} has moved")
+      end
     end
     sleep 30
   end
