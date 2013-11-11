@@ -1,0 +1,52 @@
+#!/usr/bin/env ruby
+# curl 
+def usage(msg=nil)
+  name = caller[-1].sub(/:\d+$/, '')
+  $stderr.puts " usage: #{name} -p <port> <dir>\n" +
+    "\t-p, --port   : port to bind to\n" +
+    "\t<dir>        : Document Root for server\n"
+  $stderr.puts "\nError: #{msg}" if msg
+  exit 1
+end
+
+require 'optparse'
+ARGV.options  { |opt|
+  opt.on("-h", "--help") { usage }
+  opt.on("-p", "--port XXX", String, "port") { |p| 
+    if p.to_i.kind_of? Integer then
+      @port = p.to_i
+    else 
+      usage("#{p} is not a valid port number")
+    end
+  }
+  opt.parse!
+}
+
+usage("no port specified") if (@port==nil) 
+@root=ARGV.shift || usage("no document root specified")
+
+require 'webrick' 
+include WEBrick
+
+require 'webrick/httpservlet/erbhandler'
+
+
+# the magic line to make .rhtml files have good mime-type
+# this makes webrick a *really* kick ass solution
+module HTTPUtils; DefaultMimeTypes["rhtml"] = "text/html"; end
+module HTTPUtils; DefaultMimeTypes["sh"] = "text/plain"; end
+
+
+Dir.chdir @root
+
+s = HTTPServer.new(
+    :Port => @port, 
+    :DocumentRoot => @root,
+    :DirectoryIndex => ["index.html","index.cgi","index.rhtml"] 
+)
+
+
+trap("INT") { s.shutdown }
+trap("TERM") { s.shutdown }
+s.start
+
